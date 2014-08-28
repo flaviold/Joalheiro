@@ -57,175 +57,115 @@ class Mat:
 		return None
 
 	def validateMove(self, mat, gemA, gemB):
-		result = False
-		pRight = 0
-		pLeft = 0
-		pUp = 0
-		pDown = 0
-		aux = mat[gemA[0]][gemA[1]]
-		mat[gemA[0]][gemA[1]] = mat[gemB[0]][gemB[1]]
-		mat[gemB[0]][gemB[1]] = aux
-		#----------------------------------------GemA---------------
-		#--------------------Horizontal----------
-		#----------Right---------------
-		cAux = gemA[1] + 1
-		while ((cAux < len(mat[gemA[0]]))and(mat[gemA[0]][cAux].color == mat[gemA[0]][gemA[1]].color)):
-			pRight += 1
-			cAux += 1
-		#----------Left----------------
-		cAux = gemA[1] - 1
-		while ((cAux >= 0)and(mat[gemA[0]][cAux].color == mat[gemA[0]][gemA[1]].color)):
-			pLeft += 1
-			cAux -= 1
-		#------------------------------
-		if (pRight + pLeft >= 2):
-			result = True
-		else:
-			pRight = 0
-			pLeft = 0
-		#--------------------Vertical---------------------
-		#----------Up----------------
-		rAux = gemA[0] - 1
-		while ((rAux >= 0)and(mat[rAux][gemA[1]].color == mat[gemA[0]][gemA[1]].color)):
-			pUp += 1
-			rAux -= 1
-		#----------Down--------------
-		rAux = gemA[0] + 1
-		while ((rAux < len(mat))and(mat[rAux][gemA[1]].color == mat[gemA[0]][gemA[1]].color)):
-			pDown += 1
-			rAux += 1
-		#----------------------------
-		if (pUp + pDown >= 2):
-			result = True
-		else:
-			pUp = 0
-			pDown = 0
-		
+		mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
+		result, pRight, pLeft, pUp, pDown = self.verifyJewel(mat, gemA)
 		if not result:
-			#----------------------------------------GemB---------------
-			#--------------------Horizontal----------
-			#----------Right---------------
-			cAux = gemB[1] + 1
-			while ((cAux < len(mat[gemA[0]]))and(mat[gemB[0]][cAux].color == mat[gemB[0]][gemB[1]].color)):
-				pRight += 1
-				cAux += 1
-			#----------Left----------------
-			cAux = gemB[1] - 1
-			while ((cAux >= 0)and(mat[gemB[0]][cAux].color == mat[gemB[0]][gemB[1]].color)):
-				pLeft += 1
-				cAux -= 1
-			#------------------------------
-			if (pRight + pLeft >= 2):
-				result = True
-			else:
-				pRight = 0
-				pLeft = 0
-			#--------------------Vertical---------------------
-			#----------Up----------------
-			rAux = gemB[0] - 1
-			while ((rAux >= 0)and(mat[rAux][gemB[1]].color == mat[gemB[0]][gemB[1]].color)):
-				pUp += 1
-				rAux -= 1
-			#----------Down--------------
-			rAux = gemB[0] + 1
-			while ((rAux < len(mat))and(mat[rAux][gemB[1]].color == mat[gemB[0]][gemB[1]].color)):
-				pDown += 1
-				rAux += 1
-			#----------------------------
-			if (pUp + pDown >= 2):
-				result = True
-			else:
-				pUp = 0
-				pDown = 0
-
+			result, pRight, pLeft, pUp, pDown = self.verifyJewel(mat, gemB)
 			if result:
 				return gemB, pRight, pLeft, pUp, pDown
 			else:
-				aux = mat[gemA[0]][gemA[1]]
-				mat[gemA[0]][gemA[1]] = mat[gemB[0]][gemB[1]]
-				mat[gemB[0]][gemB[1]] = aux
+				mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
 		else:
 			return gemA, pRight, pLeft, pUp, pDown
 
 		return None
 
+	def verifyJewel(self, mat, gem):
+		pRight = 0
+		pLeft = 0
+		pUp = 0
+		pDown = 0
+		makePoint = False
+		#--------------------Horizontal----------
+		#----------Right---------------
+		c = gem[1] + 1
+		while ((c < len(mat[gem[0]]))and(mat[gem[0]][c].color == mat[gem[0]][gem[1]].color)):
+			pRight += 1
+			c += 1
+		#----------Left----------------
+		c = gem[1] - 1
+		while ((c >= 0)and(mat[gem[0]][c].color == mat[gem[0]][gem[1]].color)):
+			pLeft += 1
+			c -= 1
+		#------------------------------
+		if (pRight + pLeft >= 2):
+			makePoint = True
+		else:
+			pRight = 0
+			pLeft = 0
+		#--------------------Vertical---------------------
+		#----------Up----------------
+		r = gem[0] - 1
+		while ((r >= 0)and(mat[r][gem[1]].color == mat[gem[0]][gem[1]].color)):
+			pUp += 1
+			r -= 1
+		#----------Down--------------
+		r = gem[0] + 1
+		while ((r < len(mat))and(mat[r][gem[1]].color == mat[gem[0]][gem[1]].color)):
+			pDown += 1
+			r += 1
+		#----------------------------
+		if (pUp + pDown >= 2):
+			makePoint = True
+		else:
+			pUp = 0
+			pDown = 0
+		return makePoint, pRight, pLeft, pUp, pDown
+
 
 	def move(self, gemA, gemB):
 		val = self.validateMove(self.mat, gemA, gemB)
 		if val != None:
-			return self.remap(val[0], val[1], val[2], val[3], val[4])
+			return self.getPoints(val[0], val[1], val[2], val[3], val[4])
 		else:
 			return 0
 
 
-	def remap(self, gem, pRight, pLeft, pUp, pDown):
+	def getPoints(self, gem, pRight, pLeft, pUp, pDown):
 		#--------------------Vertical----------------------
 		rAux = gem[0]+pDown
 		jump = pDown+pUp+1
-		while ((rAux - jump) >= 0):
-			if self.mat[rAux-jump][gem[1]].color != "X":
-				if self.mat[rAux][gem[1]] != "X":
-					self.mat [rAux][gem[1]] = self.mat[rAux-jump][gem[1]]
-					rAux -= 1
-				else:
-					rAux -= 1
-					jump -= 1
-			else:
-				jump += 1
-		while (rAux >= 0):
-			if self.mat[rAux][gem[1]].color != "X":
-				self.mat[rAux][gem[1]] = Jewel(self.jColors[random.randrange(len(self.jColors)-1)])
-			rAux -= 1
+		self.remap(rAux, gem[1], jump)
 		#--------------------Horizontal--------------------
 		#--------------------Right-------------------------
 		cAux = gem[1]
 		while (cAux <= (gem[1] + pRight)):
 			rAux = gem[0]
 			jump = 1
-			while ((rAux - jump) >= 0):
-				if self.mat[rAux-jump][cAux].color != "X":
-					if self.mat[rAux][cAux] != "X":
-						self.mat [rAux][cAux] = self.mat[rAux-jump][cAux]
-						rAux -= 1
-					else:
-						rAux -= 1
-						jump -= 1
-				else:
-					jump += 1
-			while (rAux >= 0):
-				if self.mat[rAux][cAux].color != "X":
-					self.mat[rAux][cAux] = Jewel(self.jColors[random.randrange(len(self.jColors)-1)])
-				rAux -= 1
+			self.remap(rAux, cAux, jump)
 			cAux += 1
 		#--------------------Left--------------------------
 		cAux = gem[1]
 		while (cAux >= (gem[1] - pLeft)):
 			rAux = gem[0]
 			jump = 1
-			while ((rAux - jump) >= 0):
-				if self.mat[rAux-jump][cAux].color != "X":
-					if self.mat[rAux][cAux] != "X":
-						self.mat [rAux][cAux] = self.mat[rAux-jump][cAux]
-						rAux -= 1
-					else:
-						rAux -= 1
-						jump -= 1
-				else:
-					jump += 1
-			while (rAux >= 0):
-				if self.mat[rAux][cAux].color != "X":
-					self.mat[rAux][cAux] = Jewel(self.jColors[random.randrange(len(self.jColors)-1)])
-				rAux -= 1
+			self.remap(rAux, cAux, jump)
 			cAux -= 1
 
 		points = (pRight + pLeft + pUp + pDown + 1)*50
 		ver = self.verifyMat()
 		if ver != None:
-			points += self.remap((ver[0], ver[1]), ver[2], ver[3], ver[4], ver[5])
+			points += self.getPoints((ver[0], ver[1]), ver[2], ver[3], ver[4], ver[5])
 
 		if not self.validateMat(self.mat):
 			self.generateMat()
 		return points
+
+	def remap(self, row, col, jump):
+		while ((row - jump) >= 0):
+			if self.mat[row-jump][col].color != "X":
+				if self.mat[row][col] != "X":
+					self.mat [row][col] = self.mat[row-jump][col]
+					row -= 1
+				else:
+					row -= 1
+					jump -= 1
+			else:
+				jump += 1
+		while (row >= 0):
+			if self.mat[row][col].color != "X":
+				self.mat[row][col] = Jewel(self.jColors[random.randrange(len(self.jColors)-1)])
+			row -= 1
 
 	def verifyMat(self):
 		for r in range(len(self.mat)):

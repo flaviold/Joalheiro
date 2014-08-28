@@ -30,7 +30,7 @@ font = pygame.font.SysFont(None, 48)
 
 while True:
 	windowObj.fill(pygame.Color(255, 255, 255))
-	stg.draw(windowObj, font)
+	stg.draw(windowObj, font, JEWELSIZE)
 
 
 	for event in pygame.event.get():
