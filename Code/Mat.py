@@ -275,7 +275,7 @@ class Mat:
 
 		return None
 
-	def draw(self, wObj):
+	def draw(self, wObj, jSize):
 		for r in range(len(self.mat)):
 			for c in range(len(self.mat[r])):
-				self.mat[r][c].draw(((32*c), (32*r)), wObj)
+				self.mat[r][c].draw(((jSize*c), (jSize*r)), wObj)

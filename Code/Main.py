@@ -4,6 +4,8 @@ from Mat import Mat
 from Jewel import Jewel
 from Stage import Stage
 
+JEWELSIZE = 32
+
 pygame.init()
 fpsClock = pygame.time.Clock()
 
@@ -20,7 +22,7 @@ colors = ["blue", "green", "orange", "purple", "red", "yellow"]
 
 stg = Stage(temp, colors)
 
-size = (len(temp[0])*32+100, len(temp)*32+100)
+size = (len(temp[0])*JEWELSIZE+100, len(temp)*JEWELSIZE+100)
 windowObj = pygame.display.set_mode(size)
 pygame.display.set_caption("Joalheiro")
 
@@ -37,6 +39,6 @@ while True:
 			sys.exit()
 		elif event.type == MOUSEBUTTONDOWN:
 			x, y = event.pos
-			stg.click(x, y)
+			stg.click(x, y, JEWELSIZE)
 
 	pygame.display.update()

@@ -7,16 +7,16 @@ class Stage:
 		self.mat = Mat(template, jColors)
 		self.selectedGem = None
 
-	def click(self, x, y):
-		self.selectJewel(x, y)
+	def click(self, x, y, jSize):
+		self.selectJewel(x, y, jSize)
 
-	def selectJewel(self, x, y):
-		if((x<len(self.mat.mat[0]*32))and(y<len(self.mat.mat)*32)):
+	def selectJewel(self, x, y, jSize):
+		if((x<len(self.mat.mat[0]*jSize))and(y<len(self.mat.mat)*jSize)):
 			r = 0
 			c = 0
-			while(r*32 < y):
+			while(r*jSize < y):
 				r += 1
-			while(c*32 < x):
+			while(c*jSize < x):
 				c += 1
 			r -= 1
 			c -= 1
@@ -50,8 +50,8 @@ class Stage:
 			for i in r:
 				i.selected = False
 
-	def draw(self, wObj, font):
-		self.mat.draw(wObj)
+	def draw(self, wObj, font, jSize):
+		self.mat.draw(wObj, jSize)
 		tObj = font.render(str(self.score), 1, (0, 0, 0))
-		position = (10, len(self.mat.mat)*32+50)
+		position = (10, len(self.mat.mat)*jSize+50)
 		wObj.blit(tObj, position)
