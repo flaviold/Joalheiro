@@ -1,10 +1,15 @@
+
+import configparser
 import pygame, sys
 from pygame.locals import *
 from Mat import Mat
 from Jewel import Jewel
 from Stage import Stage
 
-JEWELSIZE = 32
+conf = configparser.ConfigParser()
+conf.read('config.ini')
+
+JEWELSIZE = conf.getint('sizes', 'jewel_size')
 
 pygame.init()
 fpsClock = pygame.time.Clock()
@@ -30,7 +35,7 @@ font = pygame.font.SysFont(None, 48)
 
 while True:
 	windowObj.fill(pygame.Color(255, 255, 255))
-	stg.draw(windowObj, font, JEWELSIZE)
+	stg.draw(windowObj, font)
 
 
 	for event in pygame.event.get():

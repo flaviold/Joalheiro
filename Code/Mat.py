@@ -1,3 +1,4 @@
+import configparser
 import random
 from Jewel import Jewel
 
@@ -215,7 +216,10 @@ class Mat:
 
 		return None
 
-	def draw(self, wObj, jSize):
+	def draw(self, wObj):
+		conf = configparser.ConfigParser()
+		conf.read('config.ini')
+		jSize = conf.getint('sizes', 'jewel_size')
 		for r in range(len(self.mat)):
 			for c in range(len(self.mat[r])):
 				self.mat[r][c].draw(((jSize*c), (jSize*r)), wObj)

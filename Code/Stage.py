@@ -1,3 +1,4 @@
+import configparser
 from Mat import Mat
 from Jewel import Jewel
 
@@ -50,8 +51,11 @@ class Stage:
 			for i in r:
 				i.selected = False
 
-	def draw(self, wObj, font, jSize):
-		self.mat.draw(wObj, jSize)
+	def draw(self, wObj, font):
+		conf = configparser.ConfigParser()
+		conf.read('config.ini')
+		jSize = conf.getint('sizes', 'jewel_size')
+		self.mat.draw(wObj)
 		tObj = font.render(str(self.score), 1, (0, 0, 0))
 		position = (10, len(self.mat.mat)*jSize+50)
 		wObj.blit(tObj, position)
