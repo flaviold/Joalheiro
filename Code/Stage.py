@@ -3,15 +3,19 @@ from Mat import Mat
 from Jewel import Jewel
 
 class Stage:
-	def __init__(self, template, jColors):
+	def __init__(self, template, jColors, wObj, clock):
+		self.wObj = wObj
 		self.score = 0
-		self.mat = Mat(template, jColors)
+		self.mat = Mat(template, jColors, wObj, clock)
 		self.selectedGem = None
 
-	def click(self, x, y, jSize):
-		self.selectJewel(x, y, jSize)
+	def click(self, x, y):
+		self.selectJewel(x, y)
 
-	def selectJewel(self, x, y, jSize):
+	def selectJewel(self, x, y):
+		conf = configparser.ConfigParser()
+		conf.read('config.ini')
+		jSize = conf.getint('sizes', 'jewel_size')
 		if((x<len(self.mat.mat[0]*jSize))and(y<len(self.mat.mat)*jSize)):
 			r = 0
 			c = 0
@@ -51,11 +55,11 @@ class Stage:
 			for i in r:
 				i.selected = False
 
-	def draw(self, wObj, font):
+	def draw(self, font):
 		conf = configparser.ConfigParser()
 		conf.read('config.ini')
 		jSize = conf.getint('sizes', 'jewel_size')
-		self.mat.draw(wObj)
+		self.mat.draw()
 		tObj = font.render(str(self.score), 1, (0, 0, 0))
 		position = (10, len(self.mat.mat)*jSize+50)
-		wObj.blit(tObj, position)
+		self.wObj.blit(tObj, position)

@@ -1,11 +1,14 @@
+import pygame
 import configparser
 import random
 from Jewel import Jewel
 
 class Mat:
-	def __init__(self, template, jewelColors):
+	def __init__(self, template, jewelColors, wObj, clock):
+		self.wObj = wObj
 		self.template = template
 		self.jColors = jewelColors
+		self.clock = clock
 		self.mat = self.generateMat()
 		
 	def generateMat(self):
@@ -36,24 +39,12 @@ class Mat:
 		for r in range(len(mat)):
 			for c in range(len(mat[r])):
 				if(((c+1) < len(mat[r]))and(self.validateMove(mat, (r, c), (r, c+1)) != None)):
-					aux = mat[r][c]
-					mat[r][c] = mat[r][c+1]
-					mat[r][c+1] = aux
 					return True
 				elif(((c-1) >= 0)and(self.validateMove(mat, (r, c), (r, c-1)) != None)):
-					aux = mat[r][c]
-					mat[r][c] = mat[r][c-1]
-					mat[r][c-1] = aux
 					return True
 				elif(((r-1) >= 0)and(self.validateMove(mat, (r, c), (r-1, c)) != None)):
-					aux = mat[r][c]
-					mat[r][c] = mat[r-1][c]
-					mat[r-1][c] = aux
 					return True
 				elif(((r+1) < len(mat))and(self.validateMove(mat, (r, c), (r+1, c)) != None)):
-					aux = mat[r][c]
-					mat[r][c] = mat[r+1][c]
-					mat[r+1][c] = aux
 					return True
 		return None
 
@@ -63,13 +54,44 @@ class Mat:
 		if not result:
 			result, pRight, pLeft, pUp, pDown = self.verifyJewel(mat, gemB)
 			if result:
+				mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
 				return gemB, pRight, pLeft, pUp, pDown
 			else:
 				mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
 		else:
+			mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
 			return gemA, pRight, pLeft, pUp, pDown
 
 		return None
+
+	def swap(self, mat, gemA, gemB):
+		print("ANIMAÇÂO")
+		conf = configparser.ConfigParser()
+		conf.read('config.ini')
+		jSize = conf.getint('sizes', 'jewel_size')
+		step = conf.getint('sizes', 'animation_step')
+		rAuxA, cAuxA = gemA[0]*jSize, gemA[1]*jSize
+		rAuxB, cAuxB = gemB[0]*jSize, gemB[1]*jSize
+		rStep, cStep = (gemA[0] - gemB[0])*step, (gemA[1] - gemB[1])*step
+		while ((rAuxA != gemB[0]*jSize)or(cAuxA != gemB[1]*jSize)):
+			self.wObj.fill(pygame.Color(255, 255, 255))
+			for r in range(len(mat)):
+				for c in range(len(mat[r])):
+					if ((r == gemA[0])and(c == gemA[1])):
+						self.mat[r][c].draw(((cAuxA), (rAuxA)), self.wObj)
+						print("A", (rAuxA, cAuxA))
+						rAuxA -= rStep
+						cAuxA -= cStep
+					elif ((r == gemB[0])and(c == gemB[1])):
+						self.mat[r][c].draw(((cAuxB), (rAuxB)), self.wObj)
+						print("B", (rAuxB, cAuxB))
+						rAuxB += rStep
+						cAuxB += cStep
+					else:
+						self.mat[r][c].draw(((jSize*c), (jSize*r)), self.wObj)
+			pygame.display.update()
+			self.clock.tick(60)
+		mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
 
 	def verifyJewel(self, mat, gem):
 		pRight = 0
@@ -117,6 +139,7 @@ class Mat:
 	def move(self, gemA, gemB):
 		val = self.validateMove(self.mat, gemA, gemB)
 		if val != None:
+			self.swap(self.mat, gemA, gemB)
 			return self.getPoints(val[0], val[1], val[2], val[3], val[4])
 		else:
 			return 0
@@ -216,10 +239,10 @@ class Mat:
 
 		return None
 
-	def draw(self, wObj):
+	def draw(self):
 		conf = configparser.ConfigParser()
 		conf.read('config.ini')
 		jSize = conf.getint('sizes', 'jewel_size')
 		for r in range(len(self.mat)):
 			for c in range(len(self.mat[r])):
-				self.mat[r][c].draw(((jSize*c), (jSize*r)), wObj)
+				self.mat[r][c].draw(((jSize*c), (jSize*r)), self.wObj)
