@@ -16,6 +16,14 @@ class Jewel:
 		else:
 			return None, None
 
+	def drawScaled(self, position, reduct, wObj):
+		conf = configparser.ConfigParser()
+		conf.read('config.ini')
+		jSize = conf.getint('sizes', 'jewel_size')
+		scaledSprite = pygame.transform.scale(self.sprite, (jSize-reduct, jSize-reduct))
+		wObj.blit(scaledSprite, position)
+
+
 	def draw(self, position, wObj):
 		if self.color != "X":
 			if self.selected:

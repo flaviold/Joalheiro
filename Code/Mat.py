@@ -64,8 +64,7 @@ class Mat:
 
 		return None
 
-	def swap(self, mat, gemA, gemB):
-		print("ANIMAÇÂO")
+	def swap(self, gemA, gemB):
 		conf = configparser.ConfigParser()
 		conf.read('config.ini')
 		jSize = conf.getint('sizes', 'jewel_size')
@@ -75,23 +74,21 @@ class Mat:
 		rStep, cStep = (gemA[0] - gemB[0])*step, (gemA[1] - gemB[1])*step
 		while ((rAuxA != gemB[0]*jSize)or(cAuxA != gemB[1]*jSize)):
 			self.wObj.fill(pygame.Color(255, 255, 255))
-			for r in range(len(mat)):
-				for c in range(len(mat[r])):
+			for r in range(len(self.mat)):
+				for c in range(len(self.mat[r])):
 					if ((r == gemA[0])and(c == gemA[1])):
 						self.mat[r][c].draw(((cAuxA), (rAuxA)), self.wObj)
-						print("A", (rAuxA, cAuxA))
 						rAuxA -= rStep
 						cAuxA -= cStep
 					elif ((r == gemB[0])and(c == gemB[1])):
 						self.mat[r][c].draw(((cAuxB), (rAuxB)), self.wObj)
-						print("B", (rAuxB, cAuxB))
 						rAuxB += rStep
 						cAuxB += cStep
 					else:
 						self.mat[r][c].draw(((jSize*c), (jSize*r)), self.wObj)
 			pygame.display.update()
 			self.clock.tick(60)
-		mat[gemA[0]][gemA[1]], mat[gemB[0]][gemB[1]] = mat[gemB[0]][gemB[1]], mat[gemA[0]][gemA[1]]
+		self.mat[gemA[0]][gemA[1]], self.mat[gemB[0]][gemB[1]] = self.mat[gemB[0]][gemB[1]], self.mat[gemA[0]][gemA[1]]
 
 	def verifyJewel(self, mat, gem):
 		pRight = 0
@@ -139,13 +136,14 @@ class Mat:
 	def move(self, gemA, gemB):
 		val = self.validateMove(self.mat, gemA, gemB)
 		if val != None:
-			self.swap(self.mat, gemA, gemB)
+			self.swap(gemA, gemB)
 			return self.getPoints(val[0], val[1], val[2], val[3], val[4])
 		else:
 			return 0
 
 
 	def getPoints(self, gem, pRight, pLeft, pUp, pDown):
+		self.destroy(gem, pRight, pLeft, pUp, pDown)
 		#--------------------Vertical----------------------
 		rAux = gem[0]+pDown
 		jump = pDown+pUp+1
@@ -174,6 +172,27 @@ class Mat:
 		if not self.validateMat(self.mat):
 			self.generateMat()
 		return points
+
+	def destroy(self, gem, pRight, pLeft, pUp, pDown):
+		conf = configparser.ConfigParser()
+		conf.read('config.ini')
+		jSize = conf.getint('sizes', 'jewel_size')
+		step = conf.getint('sizes', 'animation_step')
+		reduction = 0
+		while (reduction < jSize):
+			blank = reduction/2
+			self.wObj.fill(pygame.Color(255, 255, 255))
+			for r in range(len(self.mat)):
+				for c in range(len(self.mat[r])):
+					if ((r >= (gem[0]-pUp))and(r <= (gem[0]+pDown))and(c == gem[1])):
+						self.mat[r][c].drawScaled(((jSize*c + blank), (jSize*r + blank)), reduction, self.wObj)
+					elif ((r == gem[0])and(c >= (gem[1]-pLeft))and(c <= (gem[1]+pRight))):
+						self.mat[r][c].drawScaled(((jSize*c + blank), (jSize*r + blank)), reduction, self.wObj)
+					else:
+						self.mat[r][c].draw((jSize*c, jSize*r), self.wObj)
+			reduction += step
+			pygame.display.update()
+			self.clock.tick(30)
 
 	def remap(self, row, col, jump):
 		while ((row - jump) >= 0):
