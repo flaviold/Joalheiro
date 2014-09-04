@@ -1,3 +1,4 @@
+import configparser
 import pygame
 
 class Jewel:
@@ -8,7 +9,10 @@ class Jewel:
 
 	def getSprite(self, color):
 		if color != "X":
-			return pygame.image.load("sprites/gem_"+color+".png"), pygame.image.load("sprites/gem_"+color+"_selected.png")
+			conf = configparser.ConfigParser()
+			conf.read('config.ini')
+			path = conf.get('paths', 'sprites')
+			return pygame.image.load(path+"gem_"+color+".png"), pygame.image.load(path+"gem_"+color+"_selected.png")
 		else:
 			return None, None
 
